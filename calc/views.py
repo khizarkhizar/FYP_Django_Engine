@@ -88,7 +88,6 @@ def get_data(request):
             tData = random.random() * 150
             gData = random.random()*600
             fData = 0
-
             #sr = serial.Serial("COM9", int(port[0]))
             # st = list(str(sr.readline(), 'utf-8'))
             # sr.close()
@@ -97,6 +96,7 @@ def get_data(request):
             # no=no+1
             defuzz, alert, aggregated = main.Fuzzy(
                 tData, gData, fData, int(tminRange[0])*1, int(tmaxRange[0])*1, int(gminRange[0])*1, int(gmaxRange[0])*1)
+            # print(tData, ',', gData, ',', defuzz, ',', alert)
 
             if (defuzz):
                 sensor_data.append(str(defuzz)+','+ok_date+','+alert)

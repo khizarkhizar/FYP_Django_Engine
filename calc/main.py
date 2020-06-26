@@ -14,18 +14,19 @@ def Fuzzy(tData, gData, fData, minRange, maxRange, gminRange, gmaxRange):
     alert = ""
     x_temp = np.arange(minRange, maxRange+1, 1)
     Total = np.abs(minRange)+np.abs(maxRange)
-    percent = 20*Total/(100)
-    vlowM = percent+minRange
-    print(vlowM)
-    lowM = percent+vlowM
-    print(lowM)
+    percent = 20 * Total / (100)
+    vlowM = percent + minRange
+    lowM = percent + vlowM
+    midM = percent+lowM
+    highM = percent+midM
+
     temp_vlo = fuzz.trimf(x_temp, [minRange, minRange, vlowM+.1])
     # Visualize these universes and membership functions
-    temp_lo = fuzz.trimf(x_temp, [15, 30, 50.1])
+    temp_lo = fuzz.trimf(x_temp, [vlowM/2, vlowM, lowM+.1])
     # fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(8, 9))
-    temp_md = fuzz.trimf(x_temp, [35, 70, 80.1])
-    temp_hi = fuzz.trimf(x_temp, [75, 90, 100.1])  #
-    temp_vhi = fuzz.trimf(x_temp, [95, maxRange+1, maxRange+1])
+    temp_md = fuzz.trimf(x_temp, [lowM - (vlowM / 2), lowM, midM+.1])
+    temp_hi = fuzz.trimf(x_temp, [midM-(vlowM / 2), midM, highM+.1])  #
+    temp_vhi = fuzz.trimf(x_temp, [highM-(vlowM / 2), maxRange+1, maxRange+1])
     temp_level_vlo = fuzz.interp_membership(x_temp, temp_vlo, tData)
     # ax0.plot(x_temp, temp_vlo, 'p', linewidth=1.5, label='very low range')
     temp_level_lo = fuzz.interp_membership(x_temp, temp_lo, tData)
@@ -35,11 +36,19 @@ def Fuzzy(tData, gData, fData, minRange, maxRange, gminRange, gmaxRange):
                                            tData)  # ax0.plot(x_temp, temp_hi, 'r', linewidth=1.5, label='High range')
     temp_level_vhi = fuzz.interp_membership(x_temp, temp_vhi, tData)
     x_Gas = np.arange(gminRange, gmaxRange+1, 1)
-    Gas_vlo = fuzz.trimf(x_Gas, [0, 0, 100.1])
-    Gas_lo = fuzz.trimf(x_Gas, [70, 150, 200.1])
-    Gas_md = fuzz.trimf(x_Gas, [160, 300, 400.1])
-    Gas_hi = fuzz.trimf(x_Gas, [350, 450, 500.1])
-    Gas_vhi = fuzz.trimf(x_Gas, [480, 601, 601])
+
+    gTotal = np.abs(gminRange) + np.abs(gmaxRange)
+    percent = 20 * gTotal / (100)
+    vlowM = percent + gminRange
+
+    lowM = percent + vlowM
+    midM = percent+lowM
+    highM = percent+midM
+    Gas_vlo = fuzz.trimf(x_Gas, [gminRange, gminRange, vlowM+.1])
+    Gas_lo = fuzz.trimf(x_Gas, [vlowM-(vlowM/3), vlowM, lowM+.1])
+    Gas_md = fuzz.trimf(x_Gas, [lowM-(vlowM/3), lowM, midM+.1])
+    Gas_hi = fuzz.trimf(x_Gas, [midM-(vlowM/3), midM, highM+.1])
+    Gas_vhi = fuzz.trimf(x_Gas, [highM-(vlowM/3), gmaxRange+1, gmaxRange+1])
     gas_level_vlo = fuzz.interp_membership(x_Gas, Gas_vlo, gData)
     gas_level_lo = fuzz.interp_membership(x_Gas, Gas_lo, gData)
     gas_level_md = fuzz.interp_membership(x_Gas, Gas_md, gData)
@@ -56,8 +65,8 @@ def Fuzzy(tData, gData, fData, minRange, maxRange, gminRange, gmaxRange):
     x_fire = np.arange(0, 101, 1)
     fire_vlo = fuzz.trimf(x_fire, [0, 0, 12])
     fire_lo = fuzz.trimf(x_fire, [11, 30, 40])
-    fire_md = fuzz.trimf(x_fire, [39, 75, 75])
-    fire_hi = fuzz.trimf(x_fire, [74, 85, 85])
+    fire_md = fuzz.trimf(x_fire, [39, 50, 65])
+    fire_hi = fuzz.trimf(x_fire, [64, 75, 85])
     fire_vhi = fuzz.trimf(x_fire, [84, 101, 101])
     # for || or condition use fmax and for and use fmin
     fire0 = np.zeros_like(x_fire)
