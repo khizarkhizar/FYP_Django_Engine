@@ -187,7 +187,7 @@ def get_custom_class():
 
 
 def History(request):
-
+    db = firestore.client()
     # Opening JSON file
     with open('templates\data.json') as json_file:
         data = json.load(json_file)
@@ -204,7 +204,7 @@ def History(request):
     if request.GET:
         Date = request.GET["datetimepicker"]
         new = list(Date)
-        for k in range(0, 4):
+        for k in range(0, 1):
             if no > 9:
                 no = 0
                 d = d+1
@@ -212,20 +212,19 @@ def History(request):
             new[15] = str(no)
             Date = ''.join(new)
             no = no+1
-            print(Date)
+
             for i in range(0, 60):
 
                 if i < 10:
                     Date1 = Date+':0'+str(i)
                 else:
                     Date1 = Date+':'+str(i)
-                print(i)
+
                 docs = (db.collection(u'Sensors_data').where(
                     u'Date', u'==', Date1).stream())
 
                 for doc in docs:
                     val.append(FYP.from_dict(doc.to_dict()))
-                    print(i)
 
     return render(request, 'history.html', {'name': val})
 
