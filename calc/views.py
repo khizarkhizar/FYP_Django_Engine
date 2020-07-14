@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 # Create your views here.
 from . import main
-
+from firebase import firebase
 from django import forms
 from django.views.generic import View
 import json
@@ -12,11 +12,11 @@ from firebase_admin import credentials, firestore
 import random
 import serial
 
-
 cred = credentials.Certificate(
     "calc/precautionary-of-fire-system-firebase-adminsdk-ikj23-7a83f45714.json")
 a = firebase_admin.initialize_app(cred)
-db = firestore.client()
+firebase = firebase.FirebaseApplication(
+    'https://precautionary-of-fire-system.firebaseio.com/', None)
 
 tmaxRange = []
 tminRange = []
@@ -61,7 +61,7 @@ def home(request):
                      ' sensor</h1> <button><a class="btn" href="/">Go Back</a></button></center>')
             return HttpResponse(a)
 
-    return render(request, 'home.html', {'file': data['sensor']})
+    return render(request, 'home.html', {'file': data['sensor'], 'TMrange': tmaxRange, 'Trange': tminRange})
 
 
 def Addsensor(request):
@@ -85,19 +85,39 @@ def get_data(request):
         now = datetime.datetime.now()
         ok_date = (str(now.strftime('%Y-%m-%d %H:%M:%S')))
         try:
-            tData = random.random() * 150
+
+            Day = (str(now.strftime('%d')))
+            print(Day)
+            Month = (str(now.strftime('%m')))
+            print(Month)
+            year = (str(now.strftime('%Y')))
+            print(year)
+            hr = (str(now.strftime('%H')))
+            mint = (str(now.strftime('%M')))
+            sec = (str(now.strftime('%S')))
+
+            # print(hr, mint, sec)
+            tData = random.random()*150
             gData = random.random()*600
             fData = 0
-            #sr = serial.Serial("COM9", int(port[0]))
+            # print(year+'/'+Month + '/'+Day+'/'+hr+'/'+mint+'/'+sec)
+            # fData = firebase.get(year+'/'+Month +
+            #                      '/'+Day+'/'+hr+'/'+mint+'/'+sec, None)
+            # gData = firebase.get('Gas/CO/'+year+'/'+Month +
+            #                      '/'+Day+'/'+hr+'/'+mint, sec)
+            # tData = firebase.get('DHT22/Temperature/' +
+            #                      year+'/'+Month+'/'+Day+'/'+hr+'/'+mint, sec)
+            print(fData, gData, tData)
+            # sr = serial.Serial("COM9", int(port[0]))
             # st = list(str(sr.readline(), 'utf-8'))
             # sr.close()
             # sensor_val = str(''.join(st[:]))
-            # tData, gData, fData = get_custom_class(no)
+
             # no=no+1
             defuzz, alert, aggregated = main.Fuzzy(
                 tData, gData, fData, int(tminRange[0])*1, int(tmaxRange[0])*1, int(gminRange[0])*1, int(gmaxRange[0])*1)
             # print(tData, ',', gData, ',', defuzz, ',', alert)
-
+            # add_example_data(tData,gData)
             if (defuzz):
                 sensor_data.append(str(defuzz)+','+ok_date+','+alert)
             else:
@@ -158,7 +178,7 @@ class FYP(object):
 
 # Custom Add data
 
-def add_example_data():
+def add_example_data(temparature, gas, flame):
     db = firestore.client()
     now = datetime.datetime.now()
     ok_date = (str(now.strftime('%d/%m/%Y %H:%M:%S')))
