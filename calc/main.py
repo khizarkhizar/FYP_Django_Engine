@@ -14,19 +14,26 @@ def Fuzzy(tData, gData, fData, minRange, maxRange, gminRange, gmaxRange):
     alert = ""
     x_temp = np.arange(minRange, maxRange+1, 1)
     Total = np.abs(minRange)+np.abs(maxRange)
-    percent = 20 * Total / (100)
+    print(Total)
+    percent = 25 * Total / (100)
+    print(percent)
     vlowM = percent + minRange
+    print(vlowM)
     lowM = percent + vlowM
+    print(lowM)
     midM = percent+lowM
-    highM = percent+midM
+    print(midM)
 
+    highM = percent+midM
+    print(highM)
     temp_vlo = fuzz.trimf(x_temp, [minRange, minRange, vlowM+.1])
     # Visualize these universes and membership functions
-    temp_lo = fuzz.trimf(x_temp, [vlowM/2, vlowM, lowM+.1])
+    temp_lo = fuzz.trimf(x_temp, [vlowM-(np.abs(vlowM)/2), vlowM, lowM+.1])
     # fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(8, 9))
-    temp_md = fuzz.trimf(x_temp, [lowM - (vlowM / 2), lowM, midM+.1])
-    temp_hi = fuzz.trimf(x_temp, [midM-(vlowM / 2), midM, highM+.1])  #
-    temp_vhi = fuzz.trimf(x_temp, [highM-(vlowM / 2), maxRange+1, maxRange+1])
+    temp_md = fuzz.trimf(x_temp, [lowM - (np.abs(vlowM)/2), lowM, midM+.1])
+    temp_hi = fuzz.trimf(x_temp, [midM-(np.abs(vlowM)/2), midM, highM+.1])  #
+    temp_vhi = fuzz.trimf(
+        x_temp, [highM-(np.abs(vlowM)/2), maxRange+1, maxRange+1])
     temp_level_vlo = fuzz.interp_membership(x_temp, temp_vlo, tData)
     # ax0.plot(x_temp, temp_vlo, 'p', linewidth=1.5, label='very low range')
     temp_level_lo = fuzz.interp_membership(x_temp, temp_lo, tData)
@@ -221,46 +228,46 @@ def Fuzzy(tData, gData, fData, minRange, maxRange, gminRange, gmaxRange):
                 # print(active_rule1)
                 Act = np.fmin(temp_level_vlo, gas_level_vlo)  # &
                 fire_activation_vlo = np.fmin(Act, fire_vlo)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
             if temp_level_lo:
                 Act = np.fmin(temp_level_lo, gas_level_vlo)  # &
                 fire_activation_vlo = np.fmin(Act, fire_vlo)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
             if temp_level_md:
                 Act = np.fmin(temp_level_md, gas_level_vlo)  # &
                 fire_activation_vlo = np.fmin(Act, fire_lo)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
             if temp_level_hi:
                 Act = np.fmin(temp_level_hi, gas_level_vlo)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
             if temp_level_vhi:
                 Act = np.fmin(temp_level_vhi, gas_level_vlo)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
         if gas_level_lo:
             if temp_level_vlo:
                 # active_rule1 = np.fmax(temp_level_vlo, temp_level_vlo)#||
                 # print(active_rule1)
                 Act = np.fmin(temp_level_vlo, gas_level_lo)  # &
                 fire_activation_vlo = np.fmin(Act, fire_vlo)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
             if temp_level_lo:
                 Act = np.fmin(temp_level_lo, gas_level_lo)  # &
                 fire_activation_lo = np.fmin(Act, fire_lo)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
             if temp_level_md:
                 Act = np.fmin(temp_level_md, gas_level_lo)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
             if temp_level_hi:
                 Act = np.fmin(temp_level_hi, gas_level_lo)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
             if temp_level_vhi:
                 Act = np.fmin(temp_level_vhi, gas_level_lo)  # &
                 fire_activation_hi = np.fmin(Act, fire_hi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
          #       print("If gas level is lo with vhi twmp", fire_activation_hi)
         if gas_level_md:
             if temp_level_vlo:
@@ -268,27 +275,27 @@ def Fuzzy(tData, gData, fData, minRange, maxRange, gminRange, gmaxRange):
                 # print(active_rule1)
                 Act = np.fmin(temp_level_vlo, gas_level_md)  # &
                 fire_activation_lo = np.fmin(Act, fire_lo)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
                 # print("If gas level is md with vlow twmp",fire_activation_lo)
             if temp_level_lo:
                 Act = np.fmin(temp_level_lo, gas_level_md)  # &
                 fire_activation_lo = np.fmin(Act, fire_lo)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
                # print("If gas level is md with low twmp", fire_activation_lo)
             if temp_level_md:
                 Act = np.fmin(temp_level_md, gas_level_md)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
               #  print("If gas level is md with md temp", fire_activation_md)
             if temp_level_hi:
                 Act = np.fmin(temp_level_hi, gas_level_md)  # &
                 fire_activation_hi = np.fmin(Act, fire_hi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
              #   print("If gas level is md with hi twmp", fire_activation_hi)
             if temp_level_vhi:
                 Act = np.fmin(temp_level_vhi, gas_level_md)  # &
                 fire_activation_hi = np.fmin(Act, fire_hi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
                 # print("If gas level is md with vhi twmp", fire_activation_hi)
         if gas_level_hi:
             if temp_level_vlo:
@@ -296,49 +303,49 @@ def Fuzzy(tData, gData, fData, minRange, maxRange, gminRange, gmaxRange):
                 # print(active_rule1)
                 Act = np.fmin(temp_level_vlo, gas_level_hi)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
               #  print("If gas level is hi with vlow twmp",fire_activation_md)
             if temp_level_lo:
                 Act = np.fmin(temp_level_lo, gas_level_hi)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
                # print("If gas level is hi with low twmp", fire_activation_md)
             if temp_level_md:
                 Act = np.fmin(temp_level_md, gas_level_hi)  # &
                 fire_activation_hi = np.fmin(Act, fire_hi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
              #   print("If gas level is hi with md temp", fire_activation_hi)
             if temp_level_hi:
                 Act = np.fmin(temp_level_hi, gas_level_hi)  # &
                 fire_activation_hi = np.fmin(Act, fire_hi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
             #    print("If gas level is hi with hi twmp", fire_activation_hi)
             if temp_level_vhi:
                 Act = np.fmin(temp_level_vhi, gas_level_hi)  # &
                 fire_activation_vhi = np.fmin(Act, fire_vhi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
            #     print("If gas level is hi with vhi twmp", fire_activation_vhi)
         if gas_level_vhi:
             if temp_level_vlo:
                 Act = np.fmin(temp_level_vlo, gas_level_vhi)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Not Normal situation'
             if temp_level_lo:
                 Act = np.fmin(temp_level_lo, gas_level_vhi)  # &
                 fire_activation_md = np.fmin(Act, fire_md)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
             if temp_level_md:
                 Act = np.fmin(temp_level_md, gas_level_vhi)  # &
                 fire_activation_hi = np.fmin(Act, fire_hi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
             if temp_level_hi:
                 Act = np.fmin(temp_level_hi, gas_level_vhi)  # &
                 fire_activation_vhi = np.fmin(Act, fire_vhi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
             if temp_level_vhi:
                 Act = np.fmin(temp_level_vhi, gas_level_vhi)  # &
                 fire_activation_vhi = np.fmin(Act, fire_vhi)  # &
-                alert = 'Normal situation'
+                alert = 'Extreme bad'
 
     aggregated = np.fmax(fire_activation_vlo,
                          np.fmax(fire_activation_lo,

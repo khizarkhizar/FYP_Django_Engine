@@ -31,7 +31,7 @@
   <body>
     <div>
       <div class="my-5 mx-auto">
-        <div class="display-5">
+        <div class="display-5 font-weight-bold">
           Choose the date and time of watching data
           <form action="">
             <input
@@ -52,26 +52,67 @@
           });
         </script>
         <div class="card shadow">
-          <table class="table table-hover">
+          <table>
             <thead>
               <tr>
                 <th scope="col">DateTime</th>
-                <th scope="col">Defuzzy</th>
                 <th scope="col">Temparature sensor</th>
-                <th scope="col">Gas sensor</th>
+                <th scope="col">Gas Sensor(CO)</th>
                 <th scope="col">Flame Sensor</th>
+                <th scope="col">Defuzzification</th>
+                <th scope="col">Fuzzification</th>
               </tr>
             </thead>
-            <tbody>
-              {% for dat in name %}
+          </table>
+          <table class="row table table-hover">
+            <tbody class="mx-1">
+              {% for dat in date %}
               <tr>
-                <td>{{dat.Date}}</td>
-                <td>{{dat.Defuzz}}</td>
-                <td>{{dat.temparature_Sensor}}</td>
-                <td>{{dat.gas_Sensor}}</td>
-                <td>{{dat.flame_Sensor}}</td>
+                <td>{{dat}}</td>
               </tr>
+
               {%endfor%}
+            </tbody>
+
+            <tbody class="mx-auto">
+              {% for t in tem %}
+              <tr>
+                <td>{{t}}</td>
+              </tr>
+
+              {%endfor%}
+            </tbody>
+            <tbody class="mx-auto">
+              {% for g in gas %}
+              <tr>
+                <td>{{g}}</td>
+              </tr>
+
+              {%endfor%}
+            </tbody>
+            <tbody class="mx-auto">
+              {% for f in flame %}
+              <tr>
+                <td>{{f}}</td>
+              </tr>
+
+              {%endfor%}
+              <tbody class="mx-auto">
+                {% for Df in Defuzzy %}
+                <tr>
+                  <td>{{Df}}</td>
+                </tr>
+  
+                {%endfor%}
+              </tbody>
+              <tbody class="mx-auto">
+                {% for fuzz in Fuzzy %}
+                <tr>
+                  <td>{{fuzz}}</td>
+                </tr>
+  
+                {%endfor%}
+              </tbody>
             </tbody>
           </table>
         </div>

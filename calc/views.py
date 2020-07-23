@@ -16,7 +16,7 @@ cred = credentials.Certificate(
     "calc/precautionary-of-fire-system-firebase-adminsdk-ikj23-7a83f45714.json")
 a = firebase_admin.initialize_app(cred)
 firebase = firebase.FirebaseApplication(
-    'https://precautionary-of-fire-system.firebaseio.com/', None)
+    'https://rtsps2020.firebaseio.com/', None)
 
 tmaxRange = []
 tminRange = []
@@ -94,30 +94,46 @@ def get_data(request):
             print(year)
             hr = (str(now.strftime('%H')))
             mint = (str(now.strftime('%M')))
-            sec = (str(now.strftime('%S')))
+            # sec = (str(now.strftime('%S')))
 
-            # print(hr, mint, sec)
-            tData = random.random()*150
-            gData = random.random()*600
-            fData = 0
+            sec = '42'
+
+            # for random variable
+            print(hr, mint)
+            # tData = random.random()*150
+            # gData = random.random()*600
+            # fData = 0
             # print(year+'/'+Month + '/'+Day+'/'+hr+'/'+mint+'/'+sec)
-            # fData = firebase.get(year+'/'+Month +
-            #                      '/'+Day+'/'+hr+'/'+mint+'/'+sec, None)
-            # gData = firebase.get('Gas/CO/'+year+'/'+Month +
-            #                      '/'+Day+'/'+hr+'/'+mint, sec)
-            # tData = firebase.get('DHT22/Temperature/' +
-            #                      year+'/'+Month+'/'+Day+'/'+hr+'/'+mint, sec)
+            fMData = (firebase.get('FlameF/'+year+'/'+Month +
+                                   '/'+Day+'/'+hr+'/'+mint, None))
+            gMData = (firebase.get('GasF/CO/'+year+'/'+Month +
+                                   '/'+Day+'/'+hr+'/'+mint, None))
+            tMData = (firebase.get('DHT22F/Temperature/' +
+                                   year+'/'+Month+'/'+Day+'/'+hr+'/'+mint, None))
+
+            # print(fMData, gMData, tMData)
+            f = list(fMData)
+            g = list(gMData)
+            t = list(tMData)
+            print(f, g, t)
+
+            fData = fMData[str(f[-1])]
+            gData = gMData[str(g[-1])]
+            tData = tMData[str(t[-1])]
+            fData = int(fData)
+            gData = float(gData[:-3])
+            tData = float(tData[:-2])
             print(fData, gData, tData)
+
+            # Direct port connection
             # sr = serial.Serial("COM9", int(port[0]))
             # st = list(str(sr.readline(), 'utf-8'))
             # sr.close()
             # sensor_val = str(''.join(st[:]))
 
-            # no=no+1
             defuzz, alert, aggregated = main.Fuzzy(
                 tData, gData, fData, int(tminRange[0])*1, int(tmaxRange[0])*1, int(gminRange[0])*1, int(gmaxRange[0])*1)
-            # print(tData, ',', gData, ',', defuzz, ',', alert)
-            # add_example_data(tData,gData)
+
             if (defuzz):
                 sensor_data.append(str(defuzz)+','+ok_date+','+alert)
             else:
@@ -130,7 +146,6 @@ def get_data(request):
         data['result'] = 'fail'
 
     return JsonResponse(data)
-
 # [START custom_class_def]
 
 
@@ -141,111 +156,72 @@ def check(request):
     return render(request, 'chart.html')
 
 
-class FYP(object):
-    def __init__(self, temparature_Sensor, gas_Sensor, flame_Sensor, Date):
-        self.temparature_Sensor = temparature_Sensor
-        self.gas_Sensor = gas_Sensor
-        self.flame_Sensor = flame_Sensor
-        self.Date = Date
-
-    @staticmethod
-    def from_dict(source):
-        # [START_EXCLUDE]
-        val = FYP(source[u'temparature_Sensor'], source[u'gas_Sensor'],
-                  source[u'flame_Sensor'], source[u'Date'])
-
-        return val
-        # [END_EXCLUDE]
-
-    def to_dict(self):
-        # [START_EXCLUDE]
-        dest = {
-            u'temparature_Sensor': self.temparature_Sensor,
-            u'gas_Sensor': self.gas_Sensor,
-            u'flame_Sensor': self.flame_Sensor,
-            u'Date': self.Date
-        }
-
-        return dest
-        # [END_EXCLUDE]
-
-    def __repr__(self):
-        return(
-            u'FYP(temparature_Sensor={}, gas_Sensor={}, flame_Sensor={}, Date={})'
-            .format(self.temparature_Sensor, self.gas_Sensor, self.flame_Sensor, self.Date))
-# [END custom_class_def]
-
-
-# Custom Add data
-
-def add_example_data(temparature, gas, flame):
-    db = firestore.client()
-    now = datetime.datetime.now()
-    ok_date = (str(now.strftime('%d/%m/%Y %H:%M:%S')))
-    cities_ref = db.collection(u'Sensors_data').document()
-    cities_ref.set(
-        FYP(120, 200, 0, ok_date).to_dict())
-    # [END add_example_data]
-
-
-# Custom retrive data
-
-
-def get_custom_class():
-
-    db = firestore.client()
-    # [START get_custom_class]
-    users_ref = db.collection(u'Sensors_data')
-    docs = users_ref.stream()
-    sensorData = []
-    for doc1 in docs:
-        sensorData.append(doc1.id)
-    doc_ref = db.collection(u'Sensors_data').document(sensorData[0])
-    doc = doc_ref.get()
-    val = FYP.from_dict(doc.to_dict())
-    return val.temparature_Sensor, val.gas_Sensor, val.flame_Sensor
-
-
 def History(request):
-    db = firestore.client()
-    # Opening JSON file
-    with open('templates\data.json') as json_file:
-        data = json.load(json_file)
 
-        # Print the type of data variable
-    print(float(data['data'][0]['id']))
+    a = []
+    date = []
+    dFuzz = []
+    fuz = []
+    temp = []
+    gas = []
+    flam = []
     Date = '23/06/2020 20:45:34'
+    tmaxRange = 80
+    tminRange = -40
+    gmaxRange = 10000
+    gminRange = 0
 
-    # Query
-
-    val = []
-    no = 0
-    d = 0
     if request.GET:
         Date = request.GET["datetimepicker"]
-        new = list(Date)
-        for k in range(0, 1):
-            if no > 9:
-                no = 0
-                d = d+1
-            new[14] = str(d)
-            new[15] = str(no)
-            Date = ''.join(new)
-            no = no+1
+        # print(Date)
+        Day = Date[0:2]
+        Month = Date[3:5]
+        year = Date[6:10]
+        hr = Date[11:13]
+        # print(Day, Month, year, hr)
+        t = firebase.get('DHT22F/Temperature/' +
+                         year+'/'+Month+'/'+Day+'/'+hr, None)
+        fData = firebase.get('FlameF/'+year+'/'+Month +
+                             '/'+Day+'/'+hr, None)
+        gData = firebase.get('GasF/CO/'+year+'/'+Month +
+                             '/'+Day+'/'+hr, None)
 
-            for i in range(0, 60):
-
-                if i < 10:
-                    Date1 = Date+':0'+str(i)
+        try:
+            k = list(t)
+            # print(k)
+            # fList = list(fData)
+            # gList = list(gData)
+            count = 0
+            stk = []
+            for count in range(0, len(k)):
+                if str(k[count]) == "None":
+                    print(k[count], count)
                 else:
-                    Date1 = Date+':'+str(i)
+                    stk.append(count)
 
-                docs = (db.collection(u'Sensors_data').where(
-                    u'Date', u'==', Date1).stream())
+                # Query
 
-                for doc in docs:
-                    val.append(FYP.from_dict(doc.to_dict()))
+            for i in range(0, len(k)):
+                pp = list(t[str(k[i])])
+                for j in range(0, len(pp)):
+                    temp.append(t[str(k[i])][str(pp[j])])
 
-    return render(request, 'history.html', {'name': val})
+                    gas.append(gData[str(k[i])][str(pp[j])])
+                    flam.append(fData[str(k[i])][str(pp[j])])
 
-    # return render(request, 'history.html', {'name': data['data']})
+                    date.append(Day+'/'+Month+'/'+year +
+                                ' '+hr+':'+str(i)+':'+str(pp[j]))
+
+                    flameData = (fData[str(k[i])][str(pp[j])])
+                    gasData = (gData[str(k[i])][str(pp[j])][:-3])
+                    tempData = (t[str(k[i])][str(pp[j])][:-2])
+                    defuzz, alert, aggregated = main.Fuzzy(
+                        float(tempData), float(gasData), int(flameData), tminRange, tmaxRange, gminRange, gmaxRange)
+                    dFuzz.append(defuzz)
+                    fuz.append(alert)
+        except Exception as e:
+            a.append('<center >  <h1>error is  '+str(e)+' </h1>   <h1>    No Date of  ' + str(Date) +
+                     ' </h1> <button><a class="btn" href="/History">Go Back</a></button></center>')
+            return HttpResponse(a)
+
+    return render(request, 'history.html', {'tem': temp, 'date': date, 'gas': gas, 'flame': flam, 'Defuzzy': dFuzz, 'Fuzzy': fuz})
